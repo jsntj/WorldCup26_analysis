@@ -8,9 +8,16 @@ DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "historical_world_
 
 
 class WorldCupPredictionAgent:
-    def __init__(self, data_path: Path = DATA_PATH):
+    def __init__(
+        self,
+        data_path: Path = DATA_PATH,
+        n_estimators: int = 200,
+        random_state: int = 42,
+    ):
         self.data_path = data_path
-        self.model = RandomForestClassifier(n_estimators=200, random_state=42)
+        self.model = RandomForestClassifier(
+            n_estimators=n_estimators, random_state=random_state
+        )
 
     def load_historical_data(self) -> pd.DataFrame:
         return pd.read_csv(self.data_path)

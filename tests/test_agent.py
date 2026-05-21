@@ -1,6 +1,8 @@
 import unittest
+from io import StringIO
+from unittest.mock import patch
 
-from worldcup26_analysis.agent import WorldCupPredictionAgent, get_default_2026_candidates
+from worldcup26_analysis.agent import WorldCupPredictionAgent, get_default_2026_candidates, main
 
 
 class TestWorldCupPredictionAgent(unittest.TestCase):
@@ -23,6 +25,19 @@ class TestWorldCupPredictionAgent(unittest.TestCase):
         self.assertIn("win_probability", result.columns)
         self.assertGreaterEqual(result["win_probability"].iloc[0], result["win_probability"].iloc[-1])
         self.assertTrue(((result["win_probability"] >= 0) & (result["win_probability"] <= 1)).all())
+
+    def test_train_fits_model(self):
+        agent = WorldCupPredictionAgent()
+        agent.train()
+        self.assertTrue(hasattr(agent.model, "n_features_in_"))
+        self.assertEqual(agent.model.n_features_in_, 3)
+
+    def test_main_runs_end_to_end(self):
+        with patch("sys.stdout", new=StringIO()) as fake_stdout:
+            main()
+            output = fake_stdout.getvalue()
+        self.assertIn("World Cup 2026 prediction ranking:", output)
+        self.assertIn("Predicted winner:", output)
 
 
 if __name__ == "__main__":
